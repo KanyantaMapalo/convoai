@@ -1,17 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Chat Bot</title>
-  <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>Chat with Server</title>
+    <style>
+        /* Add your custom CSS styling here */
+    </style>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="chat-log" id="chat-log"></div>
-    <div class="chat-input">
-      <input type="text" id="user-input" placeholder="Type your message..." />
-      <button onclick="sendMessage()">Send</button>
+    <h1>Chat with Server</h1>
+    <div id="chat-container">
+        <div id="chat-log"></div>
+        <div id="user-input">
+            <input type="text" id="message-input" placeholder="Type your message here" />
+            <button id="send-button">Send</button>
+        </div>
     </div>
-  </div>
-  <script src="main.js"></script>
+
+    <script>
+        const chatLog = document.getElementById('chat-log');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+    
+        // Send user message to the server and display the response
+        function sendMessage() {
+            const message = messageInput.value;
+            if (message.trim() !== '') {
+                const data = {
+                    input: message
+                };
+    
+                fetch('http://kanyanta.pythonanywhere.com/response', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    displayResponse(data.response);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+    
+                messageInput.value = '';
+            }
+        }
+    
+        // Display the response in the chat log
+        function displayResponse(response) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.innerHTML = `<strong>Server:</strong> ${response}`;
+    
+            chatLog.appendChild(messageElement);
+        }
+    
+        // Event listener for sending a message
+        sendButton.addEventListener('click', sendMessage);
+    
+        // Event listener for pressing Enter in the input field
+        messageInput.addEventListener('keypress', function (event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>    
 </body>
 </html>
